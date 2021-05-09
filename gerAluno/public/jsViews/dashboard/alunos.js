@@ -1,9 +1,6 @@
 // Token a ser utilizado para consumir a API
 let token = $(".span-token").text();
 
-// Select que contém os cursos
-let select_cursos = $("#curso-atual").clone();
-
 // Clonando estado inicial da Modal
 let modal_init = $("#modal_crud_aluno").clone();
 
@@ -15,7 +12,7 @@ $("#pills-alunos-tab").on("click", () => {
     $(document).ready(() => {
       // Adiciona um input de texto em cada coluna
       $("#alunosTable thead tr").clone(true).appendTo("#alunosTable thead");
-      $("#alunosTable thead tr:eq(1) th").each(function (i) {
+      $("#alunosTable   thead tr:eq(1) th").each(function (i) {
         var title = $(this).text();
         $(this).html(
           '<input type="text" placeholder="Buscar ' + title + '" />'
@@ -116,14 +113,23 @@ const crudModal_aluno = (data) => {
   if (option_up_or_set === "update") {
     // Caso esteja vazio, popular
 
+    // Limpa select
+    $("#curso-atual option").each(function () {
+      if ($(this).val() != "") {
+        $(this).remove();
+      }
+    });
+
+    populaSelectCurso();
+
     // Carregar dados do registro atual nos inputs da modal
     let modal_input = $("#input-atualiza-aluno :input");
     let data_keys = Object.keys(data);
     let data_values = Object.values(data);
 
-    // Carrega o id_curso do usuário no select box e o define na session storage para uso posterior
-    $("#default-curso").text(data_values[2]);
-    $("#default-curso").val(data_values[3]);
+    // Carrega o id_curso do usuário no select box
+    //$("#default-curso").text(data_values[2]);
+    //$("#default-curso").val(data_values[3]);
 
     for (let i = 0; i < modal_input.length; i++) {
       for (let j = 0; j < modal_input.length; j++) {
@@ -196,7 +202,6 @@ const recuperaCEP = (e) => {
 
 // Quando a modal fechar, chamar a função para resetar o formulário
 $("#modal_crud_aluno").on("hidden.bs.modal", (e) => {
-  $("#curso-atual").replaceWith(select_cursos);
   limpa_formulário_cep();
 });
 
@@ -208,6 +213,8 @@ $("#deleta-aluno").on("click", (e) => {
   e.preventDefault();
 
   let matricula_aluno = $("#matricula").val();
+
+  let array_aluno = { id: matricula_aluno };
 
   Swal.fire({
     title: "Você tem certeza?",
@@ -222,7 +229,7 @@ $("#deleta-aluno").on("click", (e) => {
       $.ajax({
         type: "DELETE",
         url: `api/removeAluno/${token}`,
-        data: JSON.stringify({ id: [matricula_aluno] }),
+        data: JSON.stringify(array_aluno),
         success: (response) => {
           // Fechando modal, pois o aluno não existe mais
           // $("#modal_crud_aluno").hide();
@@ -252,6 +259,35 @@ $("#deleta-aluno").on("click", (e) => {
   });
 });
 
+const populaSelectCurso = (control) => {
+  // Popular select dos cursos
+  $.ajax({
+    type: "GET",
+    url: `api/getCursos/${token}`,
+    success: (response) => {
+      let input = $("#curso-atual")[0];
+
+      // Limpa select
+      $("#curso-atual option").each(function () {
+        if ($(this).val() != "") {
+          $(this).remove();
+        }
+      });
+
+      response.data.forEach((item) => {
+        let option_el = document.createElement("option");
+        option_el.value = item.id;
+        option_el.text = item.nome;
+
+        input.append(option_el);
+      });
+    },
+    error: (error) => {
+      console.log(error);
+    },
+  });
+};
+
 // Abre modal para cadastrar o aluno
 
 $(".cadastra-aluno-btn").on("click", (e) => {
@@ -260,19 +296,21 @@ $(".cadastra-aluno-btn").on("click", (e) => {
   //$("#modal_crud_aluno").replaceWith(modal_init);
   $("#deleta-aluno").hide();
 
+  // Resetando form ao abrir cadastro de aluno
+  let form = $("#input-atualiza-aluno");
+  form[0].reset();
+
   // Abre modal para cadastro do aluno
-  $(".modal-backdrop").show();
   $("#modal_crud_aluno").modal("show");
-  //$("#modal_crud_aluno").toggle();
+
+  populaSelectCurso("update");
 
   // Modificar modal para efetuar o cadastro, e não update
-
   $(".titleModal").text("Cadastrar aluno");
   $(".titleModal").val("cadastro");
 });
 
 // Botão para cadastrar ou atualizar o aluno
-
 $("#envia-dados-atualizados").on("click", (e) => {
   e.preventDefault();
   let estado_modal = $(".titleModal").val();
@@ -353,10 +391,6 @@ $("#envia-dados-atualizados").on("click", (e) => {
         $("#alunosTable").DataTable().ajax.reload();
 
         // Fechando modal
-        // $("#modal_crud_aluno").hide();
-        // $(".modal-backdrop").remove();
-        // $("#modal_crud_aluno").hide();
-        // $(".modal-backdrop").hide();
         $("#modal_crud_aluno").modal("hide");
 
         // Enviar mensagem de sucesso pro usuário

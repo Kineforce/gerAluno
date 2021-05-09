@@ -38,7 +38,7 @@ class Curso_model extends CI_Model {
 
     public function deletaCurso(Array $dados_curso){
 
-        $id_curso = $this->db->escape($dados_curso['id'][0]);
+        $id_curso = $this->db->escape($dados_curso['id']);
 
         $encontra_curso = $this->db->query("    SELECT  1
                                                 FROM    CURSO 

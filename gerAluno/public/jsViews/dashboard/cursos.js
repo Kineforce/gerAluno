@@ -144,6 +144,8 @@ $("#deleta-curso").on("click", (e) => {
 
   let id_curso = sessionStorage.getItem("id_curso");
 
+  let array_curso = { id: id_curso };
+
   Swal.fire({
     title: "Você tem certeza?",
     text:
@@ -158,7 +160,7 @@ $("#deleta-curso").on("click", (e) => {
       $.ajax({
         type: "DELETE",
         url: `api/removecurso/${token}`,
-        data: JSON.stringify({ id: [id_curso] }),
+        data: JSON.stringify(array_curso),
         success: (response) => {
           // Fechando modal, pois o curso não existe mais
           // $("#modal_crud_curso").hide();

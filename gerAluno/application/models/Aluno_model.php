@@ -90,7 +90,7 @@ class Aluno_model extends CI_Model {
 
     public function deletaAluno(Array $dados_curso){
 
-        $matricula_aluno = $this->db->escape($dados_curso['id'][0]);
+        $matricula_aluno = $this->db->escape($dados_curso['id']);
 
 
 

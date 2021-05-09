@@ -92,10 +92,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                     </div>
                                     <div class="form-group">
                                         <label for="id_curso">CURSO</label>
-                                        <!-- <select class="form-select" id="curso-atual">
+                                        <select class="form-select" id="curso-atual">
                                             <option name="id_curso" id="default-curso" value="" selected></option>                                           
-                                        </select> -->
-                                        <input class="form-control" type="text" id="curso" placeholder="Id do curso">
+                                        </select>
+                                        <!-- <input class="form-control" type="text" id="curso" placeholder="Id do curso"> -->
                                     </div>    
                                     <div class="form-group">
                                         <label>CEP
