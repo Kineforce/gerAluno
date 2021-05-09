@@ -82,16 +82,12 @@ $("#pills-alunos-tab").on("click", () => {
         $("#deleta-aluno").show();
 
         // Define na sessão o ID do curso do aluno para ser usado posteriormente
-
-        if (sessionStorage.getItem("curso_id")) {
-          sessionStorage.removeItem("curso_id");
-        }
-        crudModal_aluno(resultado_linha_selecionada);
-
         sessionStorage.setItem(
           "curso_id",
           resultado_linha_selecionada.id_curso
         );
+
+        crudModal_aluno(resultado_linha_selecionada);
       });
     });
   }
@@ -121,6 +117,15 @@ const crudModal_aluno = (data) => {
     });
 
     populaSelectCurso();
+
+    setTimeout(() => {
+      let id_curso_select = sessionStorage.getItem("curso_id");
+
+      $(`#curso-atual option[value=${id_curso_select}]`).attr(
+        "selected",
+        "selected"
+      );
+    }, 200);
 
     // Carregar dados do registro atual nos inputs da modal
     let modal_input = $("#input-atualiza-aluno :input");
