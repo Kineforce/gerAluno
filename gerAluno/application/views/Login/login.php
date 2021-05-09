@@ -2,22 +2,31 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 
-<div class="container justify-content-center login-container p-5">
-    <h2>Login - gerAluno</h2>
-    <div class="p-3">
-        <form id="login_form">
-        <div class="mw-50 mb-3">
-            <label for="inputUsuario" class="form-label">Usuário</label>
-            <input type="text" name="usuario" class="form-control" id="inputUsuario">
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-lg-4 col-md-8 col-sm-8">
+            <div class="card shadow">
+                <div class="card-title text-center border-bottom">
+                    <h2 class="p-3">Login</h2>
+                </div>
+                <div class="card-body">
+                    <form id="login_form">
+                        <div class="mb-4">
+                            <label for="inputUsuario" class="form-label">Usuário</label>
+                            <input type="text" name="usuario" class="form-control" id="inputUsuario">
+                        </div>
+                        <div class="mb-4">
+                            <label for="inputPwd" class="form-label">Senha</label>
+                            <input type="password" name="pwd" class="form-control" id="inputPwd">
+                        </div>
+                        <button type="submit" id="submit_btn" class="btn btn-primary">Enviar</button>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="mw-50 mb-3">
-            <label for="inputPwd" class="form-label">Senha</label>
-            <input type="password" name="pwd" class="form-control" id="inputPwd">
-        </div>
-        <button type="submit" id="submit_btn" class="btn btn-primary">Enviar</button>
-        </form>
     </div>
 </div>
+
 
 <!-- Modal -->
 <div class="modal fade" id="modal_carregamento" tabindex="-1" role="dialog" aria-labelledby="modal_carregamento" aria-hidden="true">
