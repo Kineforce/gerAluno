@@ -7,7 +7,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <div class="col-lg-4 col-md-8 col-sm-8">
             <div class="card shadow">
                 <div class="card-title text-center border-bottom">
-                    <h2 class="p-3">Login</h2>
+                    <h2 class="p-3">gerAluno - Login</h2>
                 </div>
                 <div class="card-body">
                     <form id="login_form">
