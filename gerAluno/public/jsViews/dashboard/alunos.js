@@ -379,11 +379,7 @@ $("#envia-dados-atualizados").on("click", (e) => {
     }
 
     if (array_data.id_curso == "") {
-      Swal.fire(
-        "Erro!",
-        "Por favor preencha o ID do curso, acessar a tab cursos para verificar os disponíveis!",
-        "error"
-      );
+      Swal.fire("Erro!", "Por favor, selecionar um curso!", "error");
       return;
     }
 
