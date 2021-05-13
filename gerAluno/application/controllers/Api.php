@@ -4,9 +4,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 use yidas\rest\Controller as REST_Controller;
 
 class Api extends REST_Controller {
+  
+  private $method_error_response = [
+    "error" => "Método não autorizado"
+  ];
 
   function __construct(){
-
+    
     // Carregando models e helpers necessários para o funcionamento da API
     parent::__construct();
 
@@ -16,33 +20,34 @@ class Api extends REST_Controller {
     $this->load->helper('valida_parametros_helper');
     $this->usuario = $this->session->userdata('usuario_autenticado');
     
+    // Valida o token recebido no request
+    $this->validaToken();
   }
 
   /**
    * Recebe como parâmetro um token vindo do request e valida se o mesmo existe no banco de dados
    * Todos os outros métodos da API implementam este método, ele está agindo como se fosse um middleware
    */
-  public function validaToken($token){
+  public function validaToken(){
+
+    $token = $this->uri->segment(3);
 
     $result_auth = $this->Auth_model->validaToken($token);
 
-    if ($result_auth){
-      return true;
+    if (!$result_auth){
+      return $this->response->json([
+        "error" => "Não autenticado!"
+      ]);
     }
-
-    return $this->response->json([
-      "error" => "Não autenticado!"
-    ]);
 
   }
 
   /**
    * Retorna todos os cursos presentes no banco de dados
    */
-  public function getCursos($token = null){
-
-    if ($this->validaToken($token) === false OR $this->request->getMethod() !== "GET"){
-      return $this->response->json('nao_autorizado', 401);
+  public function getCursos(){
+    if ($this->request->getMethod() !== "GET"){
+      return $this->response->json($this->method_error_response, 401);
     }
     
     // Convertendo formato para o plugin DataTable receber corretamente os dados
@@ -54,9 +59,9 @@ class Api extends REST_Controller {
   /**
    * Retorna todos os alunos presentes no banco de dados
    */
-  public function getAlunos($token = null){
-    if ($this->validaToken($token) === false OR $this->request->getMethod() !== "GET"){
-      return $this->response->json('nao_autorizado', 401);
+  public function getAlunos(){
+    if ($this->request->getMethod() !== "GET"){
+      return $this->response->json($this->method_error_response, 401);
     }
 
     // Convertendo formato para o plugin DataTable receber corretamente os dados
@@ -69,9 +74,9 @@ class Api extends REST_Controller {
   /**
    * Registra um novo aluno com base nos parâmetros do corpo do request
    */
-  public function setAluno($token = null){
-    if ($this->validaToken($token) === false OR $this->request->getMethod() !== "POST"){
-      return $this->response->json('nao_autorizado', 401);
+  public function setAluno(){
+    if ($this->request->getMethod() !== "POST"){
+      return $this->response->json($this->method_error_response, 401);
     }
 
     $dados_aluno = json_decode($this->request->getRawBody(), true);
@@ -99,9 +104,9 @@ class Api extends REST_Controller {
    /**
    * Registra um novo curso com base nos parâmetros do corpo do request
    */
-  public function setCurso($token = null){
-    if ($this->validaToken($token) === false OR $this->request->getMethod() !== "POST"){
-      return $this->response->json('nao_autorizado', 401);
+  public function setCurso(){
+    if ($this->request->getMethod() !== "POST"){
+      return $this->response->json($this->method_error_response, 401);
     }
 
     $dados_curso = json_decode($this->request->getRawBody(), true);
@@ -131,9 +136,9 @@ class Api extends REST_Controller {
    /**
    * Atualiza um curso existente com base ID do curso presente no corpo do request
    */
-  public function updateCurso($token = null){
-    if ($this->validaToken($token) === false OR $this->request->getMethod() !== "PUT"){
-      return $this->response->json('nao_autorizado', 401);
+  public function updateCurso(){
+    if ($this->request->getMethod() !== "PUT"){
+      return $this->response->json($this->method_error_response, 401);
     }
 
     $dados_curso = json_decode($this->request->getRawBody(), true);
@@ -161,9 +166,9 @@ class Api extends REST_Controller {
    /**
    * Atualiza um aluno existente com base na matŕicula presente no corpo do request
    */
-  public function updateAluno($token = null){
-    if ($this->validaToken($token) === false OR $this->request->getMethod() !== "PUT"){
-      return $this->response->json('nao_autorizado', 401);
+  public function updateAluno(){
+    if ($this->request->getMethod() !== "PUT"){
+      return $this->response->json($this->method_error_response, 401);
     }
 
     $dados_aluno = json_decode($this->request->getRawBody(), true);
@@ -192,9 +197,9 @@ class Api extends REST_Controller {
    /**
    * Remove um curso existente com base no ID do curso presente do corpo do request
    */
-  public function removeCurso($token = null){
-    if ($this->validaToken($token) === false OR $this->request->getMethod() !== "DELETE"){
-      return $this->response->json('nao_autorizado', 401);
+  public function removeCurso(){
+    if ($this->request->getMethod() !== "DELETE"){
+      return $this->response->json($this->method_error_response, 401);
     }
 
     $dados_curso = json_decode($this->request->getRawBody(), true);
@@ -223,14 +228,9 @@ class Api extends REST_Controller {
   /**
    * Remove um aluno com base na matrícula presente no corpo do request
    */
-  public function removeAluno($token = null){
-
-    return $this->response->json($this->request);
-
-    $auth_result = $this->validaToken($token);
-
-    if (isset($auth_result['error']) OR $this->request->getMethod() !== "DELETE"){
-      return "AIN";
+  public function removeAluno(){
+    if ($this->request->getMethod() !== "DELETE"){
+      return $this->response->json($this->method_error_response, 401);
     }
 
     $dados_aluno = json_decode($this->request->getRawBody(), true);
