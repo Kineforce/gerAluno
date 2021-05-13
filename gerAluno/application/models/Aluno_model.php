@@ -35,7 +35,9 @@ class Aluno_model extends CI_Model {
                                             WHERE   ID = $curso");
 
         if(!$valida_curso->result()){
-            return false;
+            return [
+                "error" => "Curso não existe"
+            ];
         }
 
         return $this->db->insert('aluno', $dados_aluno);
@@ -64,13 +66,17 @@ class Aluno_model extends CI_Model {
                                                 WHERE   matricula = $matricula_aluno"
                                             );                                                 
 
-        if (!$encontra_curso->result()){
-            return 'curso_nao_existe';
-        }                              
-        
         if (!$encontra_aluno->result()){
-            return 'aluno_nao_existe';
-        }
+            return [
+                "error" => "Aluno não existe"
+            ];
+        }     
+
+        if (!$encontra_curso->result()){
+            return [
+                "error" => "Curso não existe"
+            ];
+        }                              
         
         $this->db->query("  UPDATE  ALUNO SET NOME      = $novo_nome_aluno
                                              ,ID_CURSO  = $novo_id_curso
@@ -92,15 +98,15 @@ class Aluno_model extends CI_Model {
 
         $matricula_aluno = $this->db->escape($dados_curso['id']);
 
-
-
         $encontra_aluno = $this->db->query("    SELECT  1
                                                 FROM    ALUNO 
                                                 WHERE   MATRICULA = $matricula_aluno"
                                             );
 
         if (!$encontra_aluno->result()){
-            return;
+            return [
+                "error" => "Aluno não existe"
+            ];
         }
 
         $this->db->query("  DELETE FROM ALUNO

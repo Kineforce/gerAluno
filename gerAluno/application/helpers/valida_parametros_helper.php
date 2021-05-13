@@ -6,8 +6,10 @@
 function parameterValidation($required,$postvalues){
 
 	try{
+		
 		$missing = array();
 
+		// Verifica se o valor não existir no request, incrementar no array $missing
 		foreach($required as $field) {
 			if(!isset($postvalues[$field])) {
 				$missing[] = $field;
@@ -16,20 +18,32 @@ function parameterValidation($required,$postvalues){
 
 		// Caso o request venha com mais parâmetros que o necessário
 		if(count($postvalues) > count($required)){
-			return 'parametros_excedidos';
+			return [
+				"error" => "Parâmetros excedidos"
+			];
 		}
 		
 		if(count($missing)>=1) {
-			$count = (count($missing)>=2?'are':'is');
-			return implode(", ", $missing).'_'.$count.'_required';
+			return $json = [
+				"error" => array(
+					"missing_parameters" => array(
+						implode(", ", $missing)
+					)
+				)
+			];
 		}
+
 		else {
-			return 'validado';
+			return [
+				"success" => "Operação efetuada"
+			];
 	} 
 
 	// Para caso haja algum erro na montagem do JSON no request
 	} catch (TypeError $e){
-		return 'estrutura_parametros_incorreta';
+		return [
+			"error" => "Estrutura de dados do request está incorreta"
+		];
 	}
 
 	

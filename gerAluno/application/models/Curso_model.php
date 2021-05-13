@@ -46,7 +46,7 @@ class Curso_model extends CI_Model {
                                             ");
 
         if (!$encontra_curso->result()){
-            return;
+            return false;
         }
 
         $this->db->query("  DELETE FROM CURSO

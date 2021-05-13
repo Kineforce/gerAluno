@@ -9,11 +9,13 @@ class Api extends REST_Controller {
 
     // Carregando models e helpers necessários para o funcionamento da API
     parent::__construct();
+
     $this->load->model('Auth_model');
     $this->load->model('Aluno_model');
     $this->load->model('Curso_model');
     $this->load->helper('valida_parametros_helper');
     $this->usuario = $this->session->userdata('usuario_autenticado');
+    
   }
 
   /**
@@ -28,7 +30,9 @@ class Api extends REST_Controller {
       return true;
     }
 
-    return false;
+    return $this->response->json([
+      "error" => "Não autenticado!"
+    ]);
 
   }
 
@@ -41,10 +45,8 @@ class Api extends REST_Controller {
       return $this->response->json('nao_autorizado', 401);
     }
     
-
-    $cursos = $this->Curso_model->retornaCursos()->result();
     // Convertendo formato para o plugin DataTable receber corretamente os dados
-    $cursos['data'] = $cursos;
+    $cursos['data'] = $this->Curso_model->retornaCursos()->result();
 
     return $this->response->json($cursos, 200);
   }
@@ -57,10 +59,8 @@ class Api extends REST_Controller {
       return $this->response->json('nao_autorizado', 401);
     }
 
-    $alunos = $this->Aluno_model->retornaAlunos()->result();
-
     // Convertendo formato para o plugin DataTable receber corretamente os dados
-    $alunos['data'] = $alunos;
+    $alunos['data'] = $this->Aluno_model->retornaAlunos()->result();
 
     return $this->response->json($alunos, 200);
 
@@ -78,18 +78,21 @@ class Api extends REST_Controller {
     $param_requeridos = array('nome', 'id_curso', 'cep', 'rua', 'numero','bairro', 'cidade', 'estado', 'ibge');
     $validacao = parameterValidation($param_requeridos, $dados_aluno);
 
-    if($validacao !== 'validado')
-    {
+    if(!isset($validacao['success'])){
       return $this->response->json($validacao, 422);
     }
 
     $cadastra_aluno = $this->Aluno_model->cadastraAluno($dados_aluno);
 
-    if(!$cadastra_aluno){
-      return $this->response->json('erro_curso', 422);
+    if(isset($cadastra_aluno['error'])){
+      return $this->response->json([
+        "error" => "Curso não existe!"
+      ], 422);
     };  
 
-    return $this->response->json('aluno_cadastrado', 201);
+    return $this->response->json([
+      "success" => "Operação efetuada com sucesso!"
+    ], 201);
 
   }
 
@@ -106,7 +109,7 @@ class Api extends REST_Controller {
     $validacao = parameterValidation($param_requeridos, $dados_curso);
 
 
-    if($validacao !== 'validado')
+    if(!isset($validacao['success']))
     {
       return $this->response->json($validacao, 422);
     }
@@ -114,10 +117,14 @@ class Api extends REST_Controller {
     $cadastra_curso = $this->Curso_model->cadastraCurso($dados_curso);
 
     if(!$cadastra_curso){
-      return $this->response->json('erro_curso', 422);
+      return $this->response->json([
+        "error" => "Erro desconhecido"
+      ], 422);
     };  
 
-    return $this->response->json('curso_cadastrado', 201);
+    return $this->response->json([
+      "success" => "Curso cadastrado com sucesso!"
+    ], 201);
 
   }
 
@@ -133,18 +140,21 @@ class Api extends REST_Controller {
     $param_requeridos = array('id', 'nome');
     $validacao = parameterValidation($param_requeridos, $dados_curso);
 
-    if($validacao !== 'validado')
-    {
+    if(!isset($validacao['success'])){
       return $this->response->json($validacao, 422);
     }
 
     $atualiza_curso = $this->Curso_model->atualizaCurso($dados_curso);
 
     if(!$atualiza_curso){
-      return $this->response->json('curso_nao_existe', 422);
+      return $this->response->json([
+        "error" => "Curso não existe"
+      ], 422);
     };  
 
-    return $this->response->json('curso_atualizado', 200);
+    return $this->response->json([
+      "success" => "Curso atualizado com sucesso!"
+    ], 200);
 
   }
 
@@ -162,18 +172,20 @@ class Api extends REST_Controller {
     $validacao = parameterValidation($param_requeridos, $dados_aluno);
 
 
-    if($validacao !== 'validado')
+    if(!isset($validacao['success']))
     {
       return $this->response->json($validacao, 422);
     }
 
     $atualiza_aluno = $this->Aluno_model->atualizaAluno($dados_aluno);
 
-    if($atualiza_aluno !== true){
+    if(isset($atualiza_aluno['error'])){
       return $this->response->json($atualiza_aluno, 422);
     };  
 
-    return $this->response->json('aluno_atualizado', 200);
+    return $this->response->json([
+      'sucess' => 'Operação efetuada com sucesso!'
+    ], 200);
 
   }
 
@@ -189,7 +201,7 @@ class Api extends REST_Controller {
     $param_requeridos = array('id');
     $validacao = parameterValidation($param_requeridos, $dados_curso);
 
-    if($validacao !== 'validado')
+    if(!isset($validacao['success']))
     {
       return $this->response->json($validacao, 422);
     }
@@ -197,10 +209,14 @@ class Api extends REST_Controller {
     $deleta_curso = $this->Curso_model->deletaCurso($dados_curso);
 
     if(!$deleta_curso){
-      return $this->response->json('curso_nao_existe', 422);
+      return $this->response->json([
+        "error" => "Curso não existe"
+      ], 422);
     };  
 
-    return $this->response->json('curso_deletado', 200);
+    return $this->response->json([
+      "success" => "Curso deletado com sucesso!"
+    ], 200);
 
   }
 
@@ -208,26 +224,33 @@ class Api extends REST_Controller {
    * Remove um aluno com base na matrícula presente no corpo do request
    */
   public function removeAluno($token = null){
-    if ($this->validaToken($token) === false OR $this->request->getMethod() !== "DELETE"){
-      return $this->response->json('nao_autorizado', 401);
+
+    return $this->response->json($this->request);
+
+    $auth_result = $this->validaToken($token);
+
+    if (isset($auth_result['error']) OR $this->request->getMethod() !== "DELETE"){
+      return "AIN";
     }
 
     $dados_aluno = json_decode($this->request->getRawBody(), true);
     $param_requeridos = array('id');
     $validacao = parameterValidation($param_requeridos, $dados_aluno);
 
-    if($validacao !== 'validado')
+    if(!isset($validacao['success']))
     {
       return $this->response->json($validacao, 422);
     }
 
     $deleta_aluno = $this->Aluno_model->deletaAluno($dados_aluno);
 
-    if(!$deleta_aluno){
-      return $this->response->json('aluno_nao_existe', 422);
+    if(isset($deleta_aluno['error'])){
+      return $this->response->json($deleta_aluno, 422);
     };  
 
-    return $this->response->json('aluno_deletado', 200);
+    return $this->response->json([
+      "success" => "Operação efetuada com sucesso!"
+    ], 200);
 
   }
 
