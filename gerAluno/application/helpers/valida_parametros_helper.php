@@ -6,7 +6,7 @@
 function parameterValidation($required,$postvalues){
 
 	try{
-		
+
 		$missing = array();
 
 		// Verifica se o valor não existir no request, incrementar no array $missing
@@ -24,7 +24,7 @@ function parameterValidation($required,$postvalues){
 		}
 		
 		if(count($missing)>=1) {
-			return $json = [
+			return [
 				"error" => array(
 					"missing_parameters" => array(
 						implode(", ", $missing)
