@@ -6,7 +6,7 @@ use yidas\rest\Controller as REST_Controller;
 class Api extends REST_Controller {
   
   private $method_error_response = [
-    "error" => "Método não autorizado"
+    "error" => "Método não autorizado, rota destinada para "
   ];
 
   function __construct(){
@@ -47,7 +47,7 @@ class Api extends REST_Controller {
    */
   public function getCursos(){
     if ($this->request->getMethod() !== "GET"){
-      return $this->response->json($this->method_error_response, 401);
+      return $this->response->json($this->method_error_response + "GET", 401);
     }
     
     // Convertendo formato para o plugin DataTable receber corretamente os dados
