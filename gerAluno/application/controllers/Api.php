@@ -5,9 +5,6 @@ use yidas\rest\Controller as REST_Controller;
 
 class Api extends REST_Controller {
   
-  private $method_error_response = [
-    "error" => "Método não autorizado, rota destinada para "
-  ];
 
   function __construct(){
     
@@ -22,6 +19,18 @@ class Api extends REST_Controller {
     
     // Valida o token recebido no request
     $this->validaToken();
+  }
+
+  /**
+   * Retorna mensagem para caso a rota seja incorreta em relação ao verbo http
+   */
+
+  public function retornaRotaCorreta($method){
+
+    return  [
+      "error" => "Método não autorizado, rota destinada para $method"
+    ];
+  
   }
 
   /**
@@ -47,7 +56,7 @@ class Api extends REST_Controller {
    */
   public function getCursos(){
     if ($this->request->getMethod() !== "GET"){
-      return $this->response->json($this->method_error_response . "GET", 401);
+      return $this->response->json($this->retornaRotaCorreta("GET") , 401);
     }
     
     // Convertendo formato para o plugin DataTable receber corretamente os dados
@@ -61,7 +70,7 @@ class Api extends REST_Controller {
    */
   public function getAlunos(){
     if ($this->request->getMethod() !== "GET"){
-      return $this->response->json($this->method_error_response . "GET", 401);
+      return $this->response->json($this->retornaRotaCorreta("GET"), 401);
     }
 
     // Convertendo formato para o plugin DataTable receber corretamente os dados
@@ -76,7 +85,7 @@ class Api extends REST_Controller {
    */
   public function setAluno(){
     if ($this->request->getMethod() !== "POST"){
-      return $this->response->json($this->method_error_response . "POST", 401);
+      return $this->response->json($this->retornaRotaCorreta("POST"), 401);
     }
 
     $dados_aluno = json_decode($this->request->getRawBody(), true);
@@ -106,7 +115,7 @@ class Api extends REST_Controller {
    */
   public function setCurso(){
     if ($this->request->getMethod() !== "POST"){
-      return $this->response->json($this->method_error_response . "POST", 401);
+      return $this->response->json($this->retornaRotaCorreta("POST"), 401);
     }
 
     $dados_curso = json_decode($this->request->getRawBody(), true);
@@ -138,7 +147,7 @@ class Api extends REST_Controller {
    */
   public function updateCurso(){
     if ($this->request->getMethod() !== "PUT"){
-      return $this->response->json($this->method_error_response . "PUT", 401);
+      return $this->response->json($this->retornaRotaCorreta("PUT"), 401);
     }
 
     $dados_curso = json_decode($this->request->getRawBody(), true);
@@ -168,7 +177,7 @@ class Api extends REST_Controller {
    */
   public function updateAluno(){
     if ($this->request->getMethod() !== "PUT"){
-      return $this->response->json($this->method_error_response . "PUT", 401);
+      return $this->response->json($this->retornaRotaCorreta("PUT"), 401);
     }
 
     $dados_aluno = json_decode($this->request->getRawBody(), true);
@@ -199,7 +208,7 @@ class Api extends REST_Controller {
    */
   public function removeCurso(){
     if ($this->request->getMethod() !== "DELETE"){
-      return $this->response->json($this->method_error_response . "DELETE", 401);
+      return $this->response->json($this->retornaRotaCorreta("DELETE"), 401);
     }
 
     $dados_curso = json_decode($this->request->getRawBody(), true);
@@ -230,7 +239,7 @@ class Api extends REST_Controller {
    */
   public function removeAluno(){
     if ($this->request->getMethod() !== "DELETE"){
-      return $this->response->json($this->method_error_response . "DELETE", 401);
+      return $this->response->json($this->retornaRotaCorreta("DELETE"), 401);
     }
 
     $dados_aluno = json_decode($this->request->getRawBody(), true);
